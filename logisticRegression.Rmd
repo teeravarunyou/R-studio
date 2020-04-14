@@ -1,0 +1,55 @@
+---
+title: "LogisticRegression"
+output: html_document
+---
+
+The library for plot and data frame
+```{r setup, include=FALSE}
+library(tidyverse)
+library(broom)
+```
+
+Load the data from the web and assign to df
+```{r}
+url='https://github.com/prasertcbs/basic-dataset/raw/master/study_hours.csv'
+df <- read_csv(url)
+```
+
+Plot the relation of x is hours and y is pass, %>% pass left hand to right hand
+```{r}
+df %>% ggplot(aes(x=Hours, y=Pass)) + geom_point()
+```
+
+Plot linear regression (for checking only)
+```{r}
+df %>% ggplot(aes(x=Hours, y=Pass)) + geom_point() +  stat_smooth(method="lm", se=FALSE)
+```
+
+Method is glm (Generalized linear model) Binomial is binary
+```{r}
+df %>% ggplot(aes(x=Hours, y=Pass)) + geom_point() + stat_smooth(method="glm", method.args=list(family="binomial"), se=FALSE) + labs(y='prop of passing exam')
+```
+
+Generalized linear model
+```{r}
+model <- glm(Pass ~ Hours, data = df, family = "binomial")
+model
+```
+
+Summary model to check the significant difference of intercept and hours
+```{r}
+summary(model)
+```
+
+Check the fit value
+```{r}
+model$fitted.values
+predict(model,type="response")
+```
+
+Cut the value more than 0.5 to True and False
+```{r}
+prob <- predict(model,type="response")
+predict <- as.numeric(prob>.5)
+predict
+```
